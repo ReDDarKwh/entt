@@ -166,13 +166,13 @@ public:
     /**
      * @brief Triggers a signal.
      *
-     * All the listeners are notified. Order isn't guaranteed.
+     * All the listeners are notified. Order should be guaranteed.
      *
      * @param args Arguments to use to invoke listeners.
      */
     void publish(Args... args) const {
-        for(auto pos = calls.size(); pos; --pos) {
-            calls[pos - 1u](args...);
+        for(size_type pos = 0; pos < calls.size(); pos++) {
+            calls[pos](args...);
         }
     }
 
@@ -378,8 +378,7 @@ class sink<sigh<Ret(Args...), Allocator>> {
 
         for(auto pos = ref.calls.size(); pos; --pos) {
             if(auto &elem = ref.calls[pos - 1u]; callback(elem)) {
-                elem = std::move(ref.calls.back());
-                ref.calls.pop_back();
+                ref.calls.erase(ref.calls.begin() + pos);
             }
         }
     }
